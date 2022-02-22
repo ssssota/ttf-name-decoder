@@ -11,15 +11,15 @@ pub enum PlatformId {
 }
 
 impl TryFrom<u16> for PlatformId {
-    type Error = &'static str;
-    fn try_from(id: u16) -> Result<Self, Self::Error> {
+    type Error = crate::Error;
+    fn try_from(id: u16) -> crate::Result<Self> {
         match id {
             0 => Ok(PlatformId::Unicode),
             1 => Ok(PlatformId::Macintosh),
             2 => Ok(PlatformId::ISO),
             3 => Ok(PlatformId::Windows),
             4 => Ok(PlatformId::Custom),
-            _ => Err("Invalid Platform ID"),
+            _ => Err(crate::Error::UnsupportedPlatform),
         }
     }
 }

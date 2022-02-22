@@ -1,19 +1,18 @@
 use crate::decoders;
 use crate::macros::generate_id_table;
-use crate::{Decoder, Error};
+use crate::{Decoder, Error, Result};
 
-pub fn get_decoder(encoding_id: u16, language_id: u16) -> Result<Decoder, Error> {
-    get_decoder_from_language_id(language_id)
-        .or(get_decoder_from_encoding_id(encoding_id))
+pub fn get_decoder(encoding_id: u16, language_id: u16) -> Result<Decoder> {
+    get_decoder_from_language_id(language_id).or(get_decoder_from_encoding_id(encoding_id))
 }
 
-fn get_decoder_from_language_id(language_id: u16) -> Result<Decoder, Error> {
+fn get_decoder_from_language_id(language_id: u16) -> Result<Decoder> {
     match LanguageId::try_from(language_id)? {
-        _ => Err("Unsupported"),
+        _ => Err(Error::UnsupportedLanguage),
     }
 }
 
-fn get_decoder_from_encoding_id(encoding_id: u16) -> Result<Decoder, Error> {
+fn get_decoder_from_encoding_id(encoding_id: u16) -> Result<Decoder> {
     match EncodingId::try_from(encoding_id)? {
         EncodingId::Roman => Ok(decoders::mac_roman_decode),
         EncodingId::Japanese => Ok(decoders::shift_jis_decode),
@@ -24,13 +23,12 @@ fn get_decoder_from_encoding_id(encoding_id: u16) -> Result<Decoder, Error> {
         EncodingId::Greek => Ok(decoders::iso_8859_7_decode),
         EncodingId::Russian => Ok(decoders::cyrillic_decode),
         EncodingId::ChineseSimplified => Ok(decoders::gbk_decode),
-        _ => Err("Unsuppoted"),
+        _ => Err(Error::UnsupportedEncoding),
     }
 }
 
 // ref. https://docs.microsoft.com/en-us/typography/opentype/spec/name#macintosh-encoding-ids-script-manager-codes
-generate_id_table! {
-    EncodingId,
+generate_id_table!(EncodingId, Error::UnsupportedEncoding, {
     Roman: 0,
     Japanese: 1,
     ChineseTraditional: 2,
@@ -64,11 +62,10 @@ generate_id_table! {
     Vietnamese: 30,
     Sindhi: 31,
     Uninterpreted: 32,
-}
+});
 
 // ref. https://docs.microsoft.com/en-us/typography/opentype/spec/name#macintosh-language-ids
-generate_id_table! {
-    LanguageId,
+generate_id_table! (LanguageId, Error::UnsupportedLanguage, {
     English: 0,
     French: 1,
     German: 2,
@@ -187,4 +184,4 @@ generate_id_table! {
     GreekPolytonic: 148,
     Greenlandic: 149,
     AzerbaijaniRomanScript: 150,
-}
+});
