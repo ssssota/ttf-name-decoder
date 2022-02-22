@@ -1,9 +1,11 @@
 [package]
-name = "ttf-name-decoder"
-version = "0.1.0"
+authors = ["Sotaro Tommykawa"]
+description = "Decoder for names of Truetype font."
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT/Apache-2.0"
+name = "ttf-name-decoder"
+repository = "https://github.com/ssssota/ttf-name-decoder"
+version = "0.1.0"
 
 [dependencies]
 encoding_rs = "0.8"
